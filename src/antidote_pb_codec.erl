@@ -741,6 +741,19 @@ start_transaction_properties_6_test() ->
                  antidote_pb_codec:decode(txn_properties,
                                           Msg#apbstarttransaction.properties)).
 
+start_transaction_properties_7_test() ->
+    Clock = term_to_binary(ignore),
+    Properties = [{certify,dont_certify},{exclusive_locks,[<<"lock1">>,<<"lock2">>]},{locks,[<<"lock1">>,<<"lock2">>]}],
+    EncRecord = antidote_pb_codec:encode(start_transaction,
+                                         {Clock, Properties}),
+    [MsgCode, MsgData] = riak_pb_codec:encode(EncRecord),
+    Msg = riak_pb_codec:decode(MsgCode, list_to_binary(MsgData)),
+    ?assertMatch(true, is_record(Msg,apbstarttransaction)),
+    ?assertMatch(ignore, binary_to_term(Msg#apbstarttransaction.timestamp)),
+    ?assertMatch(Properties,
+                 antidote_pb_codec:decode(txn_properties,
+                                          Msg#apbstarttransaction.properties)).
+
 
 read_transaction_test() ->
     Objects = [{<<"key1">>, antidote_crdt_counter_pn, <<"bucket1">>},

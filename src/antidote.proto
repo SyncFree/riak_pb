@@ -132,11 +132,11 @@ message ApbOperationResp {
 
 // Properties parameters of a transaction
 message ApbTxnProperties {
-    optional int32 certify = 1;
-    repeated bytes locks = 2;
-    repeated bytes shared_locks = 4;
-    repeated bytes exclusive_locks = 5;
-    optional int32 update_clock = 3;
+    optional int32 certify = 11;
+    repeated bytes locks = 12;
+    repeated bytes shared_locks = 14;
+    repeated bytes exclusive_locks = 15;
+    optional int32 update_clock = 13;
 }
 // Possible Properties
 /*
