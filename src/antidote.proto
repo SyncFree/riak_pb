@@ -134,6 +134,7 @@ message ApbOperationResp {
 message ApbTxnProperties {
     optional uint32 read_write = 1 ; //default = 0 = read_write, 1 = read_only, 2 = write_only
     optional uint32 red_blue = 2 ; // default = 0 = blue, 1 = red
+    optional bool update_snapshot = 3; //default true
 }
 
 // Object (Key) representation

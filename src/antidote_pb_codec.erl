@@ -144,14 +144,17 @@ encode_abort_transaction(TxId) ->
   #apbaborttransaction{transaction_descriptor = TxId}.
 
 
-encode_txn_properties(_Props) ->
+encode_txn_properties(Props) ->
   %%TODO: Add more property parameters
-  #apbtxnproperties{}.
+  case lists:keyfind(update_snapshot, 1, Props) of
+    {update_snapshot, Flag} ->  #apbtxnproperties{update_snapshot=Flag};
+    _ -> #apbtxnproperties{}
+  end.
 
-decode_txn_properties(_Properties) ->
-  {}.
-
-
+decode_txn_properties(#apbtxnproperties{update_snapshot=undefined}) ->
+  {};
+decode_txn_properties(#apbtxnproperties{update_snapshot=Flag}) ->
+  [{update_clock = Flag}].
 
 %%%%%%%%%%%%%%%%%%%%%
 %% Updates
