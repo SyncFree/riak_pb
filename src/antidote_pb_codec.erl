@@ -78,6 +78,12 @@ encode(read_object_resp, Resp) ->
   encode_read_object_resp(Resp);
 encode(static_read_objects_response, {ok, Results, CommitTime}) ->
   encode_static_read_objects_response(Results, CommitTime);
+encode(create_dc, Nodes) ->
+  encode_create_dc(Nodes);
+encode(get_connection_descriptor, _) ->
+  encode_get_connection_descriptor();
+encode(connect_to_dcs, Descriptors) ->
+  encode_connect_to_dcs(Descriptors);
 encode(error_code, Code) ->
   encode_error_code(Code);
 encode(_Other, _) ->
@@ -138,14 +144,17 @@ encode_abort_transaction(TxId) ->
   #apbaborttransaction{transaction_descriptor = TxId}.
 
 
-encode_txn_properties(_Props) ->
+encode_txn_properties(Props) ->
   %%TODO: Add more property parameters
-  #apbtxnproperties{}.
+  case lists:keyfind(update_snapshot, 1, Props) of
+    {update_snapshot, Flag} ->  #apbtxnproperties{update_snapshot=Flag};
+    _ -> #apbtxnproperties{}
+  end.
 
-decode_txn_properties(_Properties) ->
-  {}.
-
-
+decode_txn_properties(#apbtxnproperties{update_snapshot=undefined}) ->
+  {};
+decode_txn_properties(#apbtxnproperties{update_snapshot=Flag}) ->
+  [{update_clock = Flag}].
 
 %%%%%%%%%%%%%%%%%%%%%
 %% Updates
@@ -259,6 +268,8 @@ decode_response(#apbstaticreadobjectsresp{objects = Objects,
     {read_objects, Values} = decode_response(Objects),
     {commit_transaction, TimeStamp} = decode_response(CommitTime),
     {static_read_objects_resp, Values, TimeStamp};
+decode_response(#apbgetconnectiondescriptorresponse{descriptor= Descriptor}) ->
+    {connection_descriptor, Descriptor};
 decode_response(Other) ->
     erlang:error("Unexpected message: ~p",[Other]).
 
@@ -327,7 +338,7 @@ encode_update_operation(_Type, {reset, {}}) ->
 encode_update_operation(antidote_crdt_counter_pn, Op_Param) ->
   #apbupdateoperation{counterop = encode_counter_update(Op_Param)};
 encode_update_operation(antidote_crdt_counter_fat, Op_Param) ->
-  #apbupdateoperation{counterop = encode_counter_update(Op_Param)};  
+  #apbupdateoperation{counterop = encode_counter_update(Op_Param)};
 encode_update_operation(antidote_crdt_set_aw, Op_Param) ->
   #apbupdateoperation{setop = encode_set_update(Op_Param)};
 encode_update_operation(antidote_crdt_set_rw, Op_Param) ->
@@ -378,7 +389,7 @@ encode_read_object_resp(antidote_crdt_register_mv, Vals) ->
 encode_read_object_resp(antidote_crdt_counter_pn, Val) ->
     #apbreadobjectresp{counter=#apbgetcounterresp{value=Val}};
 encode_read_object_resp(antidote_crdt_counter_fat, Val) ->
-    #apbreadobjectresp{counter=#apbgetcounterresp{value=Val}};    
+    #apbreadobjectresp{counter=#apbgetcounterresp{value=Val}};
 encode_read_object_resp(antidote_crdt_set_aw, Val) ->
     #apbreadobjectresp{set=#apbgetsetresp{value=Val}};
 encode_read_object_resp(antidote_crdt_set_rw, Val) ->
@@ -545,7 +556,16 @@ decode_map_entry(#apbmapentry{key = KeyEnc, value = ValueEnc}) ->
   {_Tag, Value} = decode_read_object_resp(ValueEnc),
   {{Key, Type}, Value}.
 
+%% Cluster Management
 
+encode_create_dc(Nodes) ->
+   #apbcreatedc{nodes=Nodes}.
+
+encode_get_connection_descriptor() ->
+  #apbgetconnectiondescriptor{}.
+
+encode_connect_to_dcs(Descriptors) ->
+  #apbconnecttodcs{descriptors = Descriptors}.
 
 
 
@@ -722,7 +742,3 @@ crdt_encode_decode_test() ->
 
 
 -endif.
-
-
-
-
