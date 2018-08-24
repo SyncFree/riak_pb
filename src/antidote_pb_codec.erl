@@ -154,7 +154,7 @@ encode_txn_properties(Props) ->
 decode_txn_properties(#apbtxnproperties{update_snapshot=undefined}) ->
   {};
 decode_txn_properties(#apbtxnproperties{update_snapshot=Flag}) ->
-  [{update_clock = Flag}].
+  [{update_clock, Flag}].
 
 %%%%%%%%%%%%%%%%%%%%%
 %% Updates
