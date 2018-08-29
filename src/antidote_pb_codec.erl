@@ -152,7 +152,7 @@ encode_txn_properties(Props) ->
   end.
 
 decode_txn_properties(#apbtxnproperties{update_snapshot=undefined}) ->
-  {};
+  [];
 decode_txn_properties(#apbtxnproperties{update_snapshot=Flag}) ->
   [{update_clock, Flag}].
 
@@ -574,7 +574,7 @@ encode_connect_to_dcs(Descriptors) ->
 %% Tests encode and decode
 start_transaction_test() ->
     Clock = term_to_binary(ignore),
-    Properties = {},
+    Properties = [],
     EncRecord = antidote_pb_codec:encode(start_transaction,
                                          {Clock, Properties}),
     [MsgCode, MsgData] = riak_pb_codec:encode(EncRecord),
