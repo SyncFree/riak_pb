@@ -273,7 +273,7 @@ decode_response(#apbgetconnectiondescriptorresponse{descriptor= Descriptor}) ->
 decode_response(#rpberrorresp{errmsg = Msg, errcode = Code}) ->
     {error, {Msg, Code}};
 decode_response(Other) ->
-    erlang:error("Unexpected message: ~p", [Other]).
+    erlang:error(unexpected_message, [Other]).
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Reading objects
