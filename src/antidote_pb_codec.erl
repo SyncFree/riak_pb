@@ -270,8 +270,10 @@ decode_response(#apbstaticreadobjectsresp{objects = Objects,
     {static_read_objects_resp, Values, TimeStamp};
 decode_response(#apbgetconnectiondescriptorresponse{descriptor= Descriptor}) ->
     {connection_descriptor, Descriptor};
+decode_response(#rpberrorresp{errmsg = Msg, errcode = Code}) ->
+    {error, {Msg, Code}};
 decode_response(Other) ->
-    erlang:error("Unexpected message: ~p",[Other]).
+    erlang:error(unexpected_message, [Other]).
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Reading objects
@@ -658,6 +660,10 @@ error_messages_test() ->
     Msg3 = riak_pb_codec:decode(MsgCode3, list_to_binary(MsgData3)),
     Resp3 = antidote_pb_codec:decode_response(Msg3),
     ?assertMatch(Resp3, {error, unknown}).
+
+error_response_test() ->
+  Msg = #rpberrorresp{errmsg = <<"abc">>, errcode = 0},
+  ?assertEqual({error, {<<"abc">>, 0}}, decode_response(Msg)).
 
 -define(TestCrdtOperationCodec(Type, Op, Param),
     ?assertEqual(
