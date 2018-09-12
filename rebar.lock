@@ -1,8 +1,10 @@
-[{<<"meck">>,
-  {git,"https://github.com/basho/meck.git",
-       {ref,"dde759050eff19a1a80fd854d7375174b191665d"}},
-  1},
+{"1.1.0",
+[{<<"meck">>,{pkg,<<"meck">>,<<"0.8.12">>},0},
  {<<"protobuffs">>,
   {git,"git://github.com/basho/erlang_protobuffs.git",
        {ref,"0dde9d3b37b7bec3a4dfb0e87684dd7039e169ab"}},
-  0}].
+  0}]}.
+[
+{pkg_hash,[
+ {<<"meck">>, <<"1F7B1A9F5D12C511848FEC26BBEFD09A21E1432EADB8982D9A8ACEB9891A3CF2">>}]}
+].
